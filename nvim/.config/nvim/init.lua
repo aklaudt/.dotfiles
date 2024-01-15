@@ -395,7 +395,7 @@ vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
     { desc = "Open harpoon window" })
 
 vim.keymap.set("n", '<leader>b', function() harpoon:list():append() end)
-
+vim.keymap.set("n", '<leader>n', function() harpoon:list():remove() end)
 vim.keymap.set("n", "<C-a>", function() harpoon:list():select(1) end)
 vim.keymap.set("n", "<C-s>", function() harpoon:list():select(2) end)
 vim.keymap.set("n", "<C-d>", function() harpoon:list():select(3) end)
