@@ -42,6 +42,9 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.api.nvim_set_keymap('n', ';', ':', { noremap = true })
+vim.api.nvim_set_keymap('n', ':', ':', { noremap = true })
+vim.api.nvim_set_keymap('n', '<CR>', 'o<ESC>', { noremap = true})
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -98,6 +101,23 @@ require('lazy').setup({
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
     dependencies = { "nvim-lua/plenary.nvim" }
+  },
+  {
+    "startup-nvim/startup.nvim",
+    requires = {"nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim"},
+    config = function()
+      require"startup".setup()
+    end
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({
+        -- Configuration here, or leave empty to use defaults
+      })
+    end
   },
 
   {
@@ -173,7 +193,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = true,
-        theme = 'onedark',
+        theme = 'nightfly',
         component_separators = '|',
         section_separators = '',
       },
@@ -396,13 +416,22 @@ vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
 
 vim.keymap.set("n", '<leader>b', function() harpoon:list():append() end)
 vim.keymap.set("n", '<leader>n', function() harpoon:list():remove() end)
-vim.keymap.set("n", "<C-a>", function() harpoon:list():select(1) end)
-vim.keymap.set("n", "<C-s>", function() harpoon:list():select(2) end)
-vim.keymap.set("n", "<C-d>", function() harpoon:list():select(3) end)
-vim.keymap.set("n", "<C-f>", function() harpoon:list():select(4) end)
-vim.keymap.set("n", "<C-g>", function() harpoon:list():select(5) end)
+vim.keymap.set("n", "<C-j>", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<C-k>", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<C-l>", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end)
+-- vim.keymap.set("n", "<C-j>", function() harpoon:list():select(5) end)
 
 
+vim.keymap.set("n", "ff", function()
+local input_string = vim.fn.input("Search For > ")
+    if (input_string == '') then
+      return
+    end
+    require("telescope.builtin").grep_string({
+      search = input_string,
+    })
+end)
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -508,7 +537,7 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  -- nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -639,6 +668,8 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
