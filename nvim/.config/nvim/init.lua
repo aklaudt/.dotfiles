@@ -42,11 +42,36 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-vim.api.nvim_set_keymap('n', ';', ':', { noremap = true })
-vim.api.nvim_set_keymap('n', ':', ':', { noremap = true })
+-- vim.api.nvim_set_keymap('n', ';', ':', { noremap = true })
 vim.api.nvim_set_keymap('n', '<CR>', 'o<ESC>', { noremap = true})
 
--- Install package manager
+-- 536572696573
+-- Function to open the corresponding header/source file
+function open_corresponding_file()
+    local current_file = vim.fn.expand('%:p') -- Get the full path of the current file
+    local file_extension = vim.fn.expand('%:e') -- Get the file extension
+
+    -- Check if the current file is a .h or .cpp file
+    if file_extension == 'h' or file_extension == 'cpp' then
+        local base_name = vim.fn.expand('%:t:r') -- Get the base name without extension
+
+        -- Check if the current file is a .h file
+        if file_extension == 'h' then
+            local cpp_file = current_file:gsub(base_name .. ".h", base_name .. ".cpp")
+            vim.cmd("edit " .. cpp_file)
+        -- Check if the current file is a .cpp file
+        elseif file_extension == 'cpp' then
+            local header_file = current_file:gsub(base_name .. ".cpp", base_name .. ".h")
+            vim.cmd("edit " .. header_file)
+        end
+    else
+        print("Not a .h or .cpp file")
+    end
+end
+
+-- Create a key mapping for opening the corresponding header/source file
+vim.api.nvim_set_keymap('n', '<leader>hf', ':lua open_corresponding_file()<CR>', { noremap = true, silent = true })
+
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -74,9 +99,9 @@ require('lazy').setup({
   -- 'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
 
-  --{
-  --  'dense-analysis/ale',
-  --},
+  {
+   'dense-analysis/ale',
+  },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -304,12 +329,8 @@ vim.cmd[[set expandtab]]
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
--- NOTE: You should make sure your terminal supports this
--- vim.o.termguicolors = true
--- vim.opt.number = true
--- vim.op.relativenumber = true
--- [[ Basic Keymaps ]]
 
+-- [[ Basic Keymaps ]]
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
@@ -319,7 +340,8 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Set "jj" as  an additional escape sequence from insert mode
-vim.api.nvim_set_keymap('i', 'jj', '<Esc>', { noremap = true })
+vim.api.nvim_set_keymap('i', 'jk', '<Esc>', { noremap = true })
+vim.api.nvim_set_keymap('i', 'kj', '<Esc>', { noremap = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -333,7 +355,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Enable ALE globally
--- vim.g.ale_enabled = 1
+vim.g.ale_enabled = 1
 
 -- Enable ALE for JavaScript and TypeScript
 -- vim.g.ale_linters = {
@@ -379,7 +401,7 @@ vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { de
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set("n", "<C-p>", "<cmd>silent !tmux neww ~/.config/bin/tmux-sessionizer<CR>")
+vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww ~/.config/bin/tmux-sessionizer<CR>")
 vim.keymap.set("n", '<leader>ex', vim.cmd.Ex)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -411,27 +433,33 @@ local function toggle_telescope(harpoon_files)
     }):find()
 end
 
+
+local function clearHarpoonList()
+    harpoon.nav.set_setting("projects", {})
+end
+
 vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
     { desc = "Open harpoon window" })
 
 vim.keymap.set("n", '<leader>b', function() harpoon:list():append() end)
 vim.keymap.set("n", '<leader>n', function() harpoon:list():remove() end)
+vim.keymap.set("n", "<C-h>", function()  end)
+vim.keymap.set('n', '<leader>nn', '<cmd>lua clearHarpoonList()<CR>', { noremap = true, silent = true })
 vim.keymap.set("n", "<C-j>", function() harpoon:list():select(1) end)
 vim.keymap.set("n", "<C-k>", function() harpoon:list():select(2) end)
 vim.keymap.set("n", "<C-l>", function() harpoon:list():select(3) end)
 vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end)
--- vim.keymap.set("n", "<C-j>", function() harpoon:list():select(5) end)
 
-
-vim.keymap.set("n", "ff", function()
-local input_string = vim.fn.input("Search For > ")
-    if (input_string == '') then
-      return
-    end
-    require("telescope.builtin").grep_string({
-      search = input_string,
-    })
-end)
+vim.keymap.set("v", "<leader>p", "\"_dP")
+-- vim.keymap.set("n", "ff", function()
+-- local input_string = vim.fn.input("Search For > ")
+--     if (input_string == '') then
+--       return
+--     end
+--     require("telescope.builtin").grep_string({
+--       search = input_string,
+--     })
+-- end)
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -578,7 +606,7 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
+  clangd = {},
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},

@@ -1,5 +1,4 @@
 # Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
 
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="bira"
@@ -25,3 +24,7 @@ SPACESHIP_CHAR_SYMBOL="⚡"
 
 # Turn off power status when using spaceship prompt
 export SPACESHIP_BATTERY_SHOW=false
+
+#Aliases
+alias ls='exa --icons'
+alias cat='batcat'
