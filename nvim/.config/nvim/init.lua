@@ -1,49 +1,7 @@
---[[
+require("aklaudt.core.options")
+require("aklaudt.core.keymaps")
+require("aklaudt.core.colorscheme")
 
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-
-Kickstart.nvim is *not* a distribution.
-
-Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
-
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
---]]
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
--- vim.api.nvim_set_keymap('n', ';', ':', { noremap = true })
-vim.api.nvim_set_keymap('n', '<CR>', 'o<ESC>', { noremap = true})
 
 -- 536572696573
 -- Function to open the corresponding header/source file
@@ -69,8 +27,6 @@ function open_corresponding_file()
     end
 end
 
--- Create a key mapping for opening the corresponding header/source file
-vim.api.nvim_set_keymap('n', '<leader>hf', ':lua open_corresponding_file()<CR>', { noremap = true, silent = true })
 
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -266,82 +222,7 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
 }, {})
-
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
-
--- Set highlight on search
-vim.o.hlsearch = false
-
--- Make line numbers default
-vim.wo.number = true
-vim.wo.relativenumber = true
-vim.o.scrolloff=12
-
--- Disable line wrap
-vim.o.wrap = false
-
--- Enable mouse mode
-vim.o.mouse = 'a'
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
-vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
--- Case-insensitive searching UNLESS \C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
--- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
-
--- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-
-vim.cmd[[set tabstop=4]]
-vim.cmd[[set shiftwidth=4]]
-vim.cmd[[set expandtab]]
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
-
-
--- [[ Basic Keymaps ]]
--- Keymaps for better default experience
--- See `:help vim.keymap.set()`
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
--- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- Set "jj" as  an additional escape sequence from insert mode
-vim.api.nvim_set_keymap('i', 'jk', '<Esc>', { noremap = true })
-vim.api.nvim_set_keymap('i', 'kj', '<Esc>', { noremap = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -401,13 +282,6 @@ vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { de
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww ~/.config/bin/tmux-sessionizer<CR>")
-vim.keymap.set("n", '<leader>ex', vim.cmd.Ex)
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-
-
-vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- Harpooon remaps
 local harpoon = require("harpoon")
@@ -451,15 +325,6 @@ vim.keymap.set("n", "<C-l>", function() harpoon:list():select(3) end)
 vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end)
 
 vim.keymap.set("v", "<leader>p", "\"_dP")
--- vim.keymap.set("n", "ff", function()
--- local input_string = vim.fn.input("Search For > ")
---     if (input_string == '') then
---       return
---     end
---     require("telescope.builtin").grep_string({
---       search = input_string,
---     })
--- end)
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -529,12 +394,6 @@ vim.defer_fn(function()
     },
   }
 end, 0)
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
@@ -696,8 +555,6 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
-
-
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
