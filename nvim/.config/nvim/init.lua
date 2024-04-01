@@ -171,8 +171,13 @@ mason_lspconfig.setup_handlers {
   end,
 }
 
--- leap for quick nav to text on screen
--- require('ggandor/leap').lazy_load().create_default_mappings()
+-- Trying to get format on save working
+-- vim.cmd([[
+--     augroup FormatOnSave
+--         autocmd!
+--         autocmd BufWritePre *.h,*.cpp :silent! execute '!git format ' .. expand('%') | edit
+--     augroup END
+-- ]])
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
