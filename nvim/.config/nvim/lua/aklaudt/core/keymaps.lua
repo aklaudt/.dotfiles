@@ -22,7 +22,7 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.api.nvim_set_keymap('i', 'jk', '<Esc>', { noremap = true })
 vim.api.nvim_set_keymap('i', 'kj', '<Esc>', { noremap = true })
 
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww ~/.config/bin/tmux-sessionizer<CR>")
+vim.keymap.set("n", "<C-p>", "<cmd>silent !tmux neww ~/.config/bin/tmux-sessionizer<CR>")
 
 -- Open explorer
 vim.keymap.set("n", '<leader>ex', vim.cmd.Ex)

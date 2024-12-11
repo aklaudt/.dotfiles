@@ -29,7 +29,7 @@ vim.o.undofile = true
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
-vim.o.smartcase = true
+-- vim.o.smartcase = true
 
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
@@ -44,4 +44,7 @@ vim.cmd[[set expandtab]]
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
+
+-- Use unix line endings
+vim.o.fileformat = "unix"
 

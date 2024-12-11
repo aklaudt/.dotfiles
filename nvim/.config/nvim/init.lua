@@ -2,30 +2,56 @@ require("aklaudt.core.options")
 require("aklaudt.core.keymaps")
 require("aklaudt.core.colorscheme")
 
-
--- Function to open the corresponding header/source file
+-- Function to open the corresponding header/source file with support for .c and .hpp files
 function open_corresponding_file()
-    local current_file = vim.fn.expand('%:p') -- Get the full path of the current file
-    local file_extension = vim.fn.expand('%:e') -- Get the file extension
+    local current_file = vim.api.nvim_buf_get_name(0)
+    local file_extension = vim.fn.expand('%:e')
+    local base_name = vim.fn.expand('%:t:r')
+    local dir_name = vim.fn.expand('%:p:h') -- Get the directory path
 
-    -- Check if the current file is a .h or .cpp file
-    if file_extension == 'h' or file_extension == 'cpp' then
-        local base_name = vim.fn.expand('%:t:r') -- Get the base name without extension
+    local function file_exists(name)
+        local f = io.open(name, "r")
+        if f ~= nil then io.close(f) return true else return false end
+    end
 
-        -- Check if the current file is a .h file
-        if file_extension == 'h' then
-            local cpp_file = current_file:gsub(base_name .. ".h", base_name .. ".cpp")
-            vim.cmd("edit " .. cpp_file)
-        -- Check if the current file is a .cpp file
-        elseif file_extension == 'cpp' then
-            local header_file = current_file:gsub(base_name .. ".cpp", base_name .. ".h")
-            vim.cmd("edit " .. header_file)
+    -- Define possible extensions for headers and sources
+    local header_extensions = { 'h', 'hpp' }
+    local source_extensions = { 'c', 'cpp' }
+
+    -- Helper function to check if an item exists in a table
+    local function contains(table, val)
+        for _, v in ipairs(table) do
+            if v == val then
+                return true
+            end
         end
+        return false
+    end
+
+    if contains(header_extensions, file_extension) then
+        -- Current file is a header file, search for corresponding source files
+        for _, ext in ipairs(source_extensions) do
+            local source_file = dir_name .. '/' .. base_name .. '.' .. ext
+            if file_exists(source_file) then
+                vim.cmd("edit " .. source_file)
+                return
+            end
+        end
+        print("Corresponding source file does not exist")
+    elseif contains(source_extensions, file_extension) then
+        -- Current file is a source file, search for corresponding header files
+        for _, ext in ipairs(header_extensions) do
+            local header_file = dir_name .. '/' .. base_name .. '.' .. ext
+            if file_exists(header_file) then
+                vim.cmd("edit " .. header_file)
+                return
+            end
+        end
+        print("Corresponding header file does not exist")
     else
-        print("Not a .h or .cpp file")
+        print("Not a recognized source or header file")
     end
 end
-
 
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -146,6 +172,15 @@ local servers = {
   },
 }
 
+-- Disable the "readability-identifier-naming" warning in clangd
+require'lspconfig'.clangd.setup{
+  cmd = { "clangd", 
+          "--clang-tidy", 
+          "--clang-tidy-checks=-readability-identifier-naming,*",  -- Disable only the readability-identifier-naming check
+          "--header-insertion=never" 
+  },
+}
+
 -- Setup neovim lua configuration
 require('neodev').setup()
 
@@ -170,14 +205,6 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
-
--- Trying to get format on save working
--- vim.cmd([[
---     augroup FormatOnSave
---         autocmd!
---         autocmd BufWritePre *.h,*.cpp :silent! execute '!git format ' .. expand('%') | edit
---     augroup END
--- ]])
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
@@ -227,6 +254,55 @@ cmp.setup {
   },
 }
 
+
+vim.api.nvim_create_user_command("WatchTest", function()
+  local overseer = require("overseer")
+  overseer.run_template({ name = "npm test" }, function(task)
+    if task then
+      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
+      local main_win = vim.api.nvim_get_current_win()
+      vim.cmd("set splitright")
+      overseer.run_action(task, "open vsplit")
+      vim.api.nvim_win_set_width(0, 80)
+      vim.api.nvim_set_current_win(main_win)
+    else
+      vim.notify("WatchTest not supported for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
+    end
+  end)
+end, {})
+
+vim.api.nvim_create_user_command("WatchTestLinux", function()
+  local overseer = require("overseer")
+  overseer.run_template({ name = "bash test" }, function(task)
+    if task then
+      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
+      local main_win = vim.api.nvim_get_current_win()
+      vim.cmd("set splitright")
+      overseer.run_action(task, "open vsplit")
+      vim.api.nvim_win_set_width(0, 80)
+      vim.api.nvim_set_current_win(main_win)
+    else
+      vim.notify("WatchTestLinux not supported for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
+    end
+  end)
+end, {})
+
+
+vim.api.nvim_create_user_command("WatchBuild", function()
+  local overseer = require("overseer")
+  overseer.run_template({ name = "cmake build" }, function(task)
+    if task then
+      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
+      local main_win = vim.api.nvim_get_current_win()
+      vim.cmd("set splitright")
+      overseer.run_action(task, "open vsplit")
+      vim.api.nvim_win_set_width(0, 80)
+      vim.api.nvim_set_current_win(main_win)
+    else
+      vim.notify("Unable to build file type " .. vim.bo.filetype, vim.log.levels.ERROR)
+    end
+  end)
+end, {})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 
