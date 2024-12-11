@@ -134,6 +134,11 @@ function scp_app() {
     scp "$file" root@"$ip":~/../../usr/local/src/bitstreams/sgc
 }
 
+#Ensure SSH Agent is configured for WSL
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+ssh-add ~/.ssh/github
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
