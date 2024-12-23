@@ -76,7 +76,6 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup("plugins", {})
 
 -- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
@@ -172,14 +171,6 @@ local servers = {
   },
 }
 
--- Disable the "readability-identifier-naming" warning in clangd
-require'lspconfig'.clangd.setup{
-  cmd = { "clangd", 
-          "--clang-tidy", 
-          "--clang-tidy-checks=-readability-identifier-naming,*",  -- Disable only the readability-identifier-naming check
-          "--header-insertion=never" 
-  },
-}
 
 -- Setup neovim lua configuration
 require('neodev').setup()
@@ -203,6 +194,23 @@ mason_lspconfig.setup_handlers {
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
     }
+  end,
+  ["clangd"] = function()
+    require("lspconfig").clangd.setup({
+        capabilities = capabilities,
+        on_attach = function(client, bufnr)
+            -- Disable clangd's formatting
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+            on_attach(client, bufnr)
+        end,
+        cmd = {
+            "clangd",
+            "--clang-tidy",
+            "--clang-tidy-checks=-readability-identifier-naming,*",
+            "--header-insertion=never",
+        },
+    })
   end,
 }
 
@@ -254,55 +262,6 @@ cmp.setup {
   },
 }
 
-
-vim.api.nvim_create_user_command("WatchTest", function()
-  local overseer = require("overseer")
-  overseer.run_template({ name = "npm test" }, function(task)
-    if task then
-      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
-      local main_win = vim.api.nvim_get_current_win()
-      vim.cmd("set splitright")
-      overseer.run_action(task, "open vsplit")
-      vim.api.nvim_win_set_width(0, 80)
-      vim.api.nvim_set_current_win(main_win)
-    else
-      vim.notify("WatchTest not supported for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
-    end
-  end)
-end, {})
-
-vim.api.nvim_create_user_command("WatchTestLinux", function()
-  local overseer = require("overseer")
-  overseer.run_template({ name = "bash test" }, function(task)
-    if task then
-      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
-      local main_win = vim.api.nvim_get_current_win()
-      vim.cmd("set splitright")
-      overseer.run_action(task, "open vsplit")
-      vim.api.nvim_win_set_width(0, 80)
-      vim.api.nvim_set_current_win(main_win)
-    else
-      vim.notify("WatchTestLinux not supported for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
-    end
-  end)
-end, {})
-
-
-vim.api.nvim_create_user_command("WatchBuild", function()
-  local overseer = require("overseer")
-  overseer.run_template({ name = "cmake build" }, function(task)
-    if task then
-      task:add_component({ "restart_on_save", paths = {vim.fn.expand("%:p")} })
-      local main_win = vim.api.nvim_get_current_win()
-      vim.cmd("set splitright")
-      overseer.run_action(task, "open vsplit")
-      vim.api.nvim_win_set_width(0, 80)
-      vim.api.nvim_set_current_win(main_win)
-    else
-      vim.notify("Unable to build file type " .. vim.bo.filetype, vim.log.levels.ERROR)
-    end
-  end)
-end, {})
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 

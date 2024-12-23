@@ -7,7 +7,7 @@ vim.g.maplocalleader = ' '
 vim.api.nvim_set_keymap('n', '<CR>', 'o<ESC>', { noremap = true})
 
 -- Create a key mapping for opening the corresponding header/source file
-vim.api.nvim_set_keymap('n', '<leader>hf', ':lua open_corresponding_file()<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>hf', ':lua open_corresponding_file()<CR>', { noremap = true, silent = true, desc = 'Open [H]eader/[F]ile' })
 
 -- [[ Basic Keymaps ]]
 -- Keymaps for better default experience
@@ -30,7 +30,6 @@ vim.keymap.set("n", '<leader>ex', vim.cmd.Ex)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
-
 -- Paste text without emptying yank buffer
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
@@ -39,4 +38,15 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+
+-- Reload Config
+vim.keymap.set('n', "<space><space>x", ":luafile ~/.config/nvim/init.lua<CR>")
+vim.keymap.set('v', "<space>x", ":lua<CR>")
+
+-- Copilot
+vim.keymap.set('i', '<S-Tab>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false
+})
+vim.g.copilot_no_tab_map = true
 
