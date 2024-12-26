@@ -9,6 +9,9 @@ return {
                 null_ls.builtins.formatting.clang_format.with({
                     filetypes = { "c", "cpp", "objc", "objcpp" },
                 }),
+                null_ls.builtins.formatting.prettier.with({
+                    filetypes = { "javascript", "typescript", "typescriptreact", "json", "yaml", "html", "css", "markdown" },
+                }),
             },
             on_attach = function(client, bufnr)
                 if client.supports_method("textDocument/formatting") then
@@ -24,7 +27,7 @@ return {
                         end,
                     })
                 end
-            end,
+            end
         })
     end,
 }
