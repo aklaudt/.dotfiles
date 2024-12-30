@@ -101,21 +101,6 @@ zle -N tmux_sessionizer
 bindkey '^[[Z' autosuggest-execute
 bindkey '^P' tmux_sessionizer 
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
 #Aliases
 alias ls='exa --icons'
 alias cat='batcat'
@@ -128,16 +113,10 @@ eval $(thefuck -y --alias shitty)
 alias sm="git submodule update --init --recursive"
 alias smf="git submodule update --init --recursive --force"
 
-function scp_app() {
-    local file=$1
-    local ip=$2
-    scp "$file" root@"$ip":~/../../usr/local/src/bitstreams/sgc
-}
-
 #Ensure SSH Agent is configured for WSL
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
-ssh-add ~/.ssh/github
+# eval "$(ssh-agent -s)"
+# ssh-add ~/.ssh/id_rsa
+# ssh-add ~/.ssh/github
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
