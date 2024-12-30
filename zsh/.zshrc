@@ -113,10 +113,8 @@ eval $(thefuck -y --alias shitty)
 alias sm="git submodule update --init --recursive"
 alias smf="git submodule update --init --recursive --force"
 
-#Ensure SSH Agent is configured for WSL
-# eval "$(ssh-agent -s)"
-# ssh-add ~/.ssh/id_rsa
-# ssh-add ~/.ssh/github
+# Alias for initializing SSH Agent
+alias ssh-init='eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && ssh-add ~/.ssh/github'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
