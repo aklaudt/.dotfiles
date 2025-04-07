@@ -85,7 +85,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    git
     zsh-autosuggestions
     )
 
@@ -93,7 +92,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 function tmux_sessionizer() {
-  ~/.config/bin/tmux-sessionizer.sh
+  ~/.config/bin/tmux-sessionizer.sh "$@"
 }
 
 zle -N tmux_sessionizer
@@ -106,19 +105,63 @@ alias ls='exa --icons'
 alias cat='batcat'
 alias tree="exa --icons --tree"
 alias nv="nvim ."
-alias keil="find . -iname \"*uvproj*\" | fzf | xargs cmd.exe /C start"
 eval $(thefuck --alias shit)
 eval $(thefuck -y --alias shitty)
+
+typeset -A program_extensions
+program_extensions=(
+  keil "*.uvproj*"
+  utopia "*.iox*"
+  excel "*.xlsx"
+)
+
+timezsh() {
+  shell=${1-$SHELL}
+  for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
+}
+
+open_with() {
+  local prog="$1"
+  shift
+
+  if [[ -z "$prog" ]]; then
+    echo "Usage: open_with <program_name>"
+    return 1
+  fi
+
+  if [[ -z "${program_extensions[$prog]}" ]]; then
+    echo "No mappings found for program '$prog'"
+    return 1
+  fi
+
+  local find_expr=()
+  local first=1
+  for pattern in ${program_extensions[$prog]}; do
+    if (( first )); then
+      find_expr+=(-iname "$pattern")
+      first=0
+    else
+      find_expr+=(-o -iname "$pattern")
+    fi
+  done
+
+  find . -maxdepth 5 \( "${find_expr[@]}" \) -print | sort -n | fzf --preview 'batcat --style=numbers --color=always {}' --height 70% --tmux 70% | xargs -r cmd.exe /C start
+}
+
+ow() {
+  open_with "$@"
+}
 
 alias sm="git submodule update --init --recursive"
 alias smf="git submodule update --init --recursive --force"
 
 # Alias for initializing SSH Agent
-alias ssh-init='eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && ssh-add ~/.ssh/github'
+alias ssh-init='eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && ssh-add ~/.ssh/github && ssh-add ~/.ssh/gitlab'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Map NVP/node source
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

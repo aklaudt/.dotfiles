@@ -31,7 +31,7 @@ vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
 vim.o.updatetime = 250
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 150
 
 vim.cmd[[set tabstop=4]]
 vim.cmd[[set shiftwidth=4]]

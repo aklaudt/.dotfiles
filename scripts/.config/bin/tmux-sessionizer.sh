@@ -3,6 +3,7 @@
 directories=(
     "$HOME/../../mnt/c/repos/"
     "$HOME/../../mnt/c/personal/"
+    "$HOME/repos/"
 )
 
 if [[ $# -eq 1 ]]; then

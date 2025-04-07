@@ -6,9 +6,9 @@ return {
 
         null_ls.setup({
             sources = {
-                null_ls.builtins.formatting.clang_format.with({
-                    filetypes = { "c", "cpp", "objc", "objcpp" },
-                }),
+                -- null_ls.builtins.formatting.clang_format.with({
+                --     filetypes = { "c", "cpp", "objc", "objcpp" },
+                -- }),
                 null_ls.builtins.formatting.prettier.with({
                     filetypes = { "javascript", "typescript", "typescriptreact", "json", "yaml", "html", "css", "markdown" },
                 }),

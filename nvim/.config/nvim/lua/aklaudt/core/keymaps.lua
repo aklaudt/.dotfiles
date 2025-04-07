@@ -31,10 +31,4 @@ vim.keymap.set("x", "<leader>p", [["_dP]])
 vim.keymap.set('n', "<space><space>x", ":luafile ~/.config/nvim/init.lua<CR>")
 vim.keymap.set('v', "<space>x", ":lua<CR>")
 
--- Copilot
-vim.keymap.set('i', '<S-Tab>', 'copilot#Accept("\\<CR>")', {
-  expr = true,
-  replace_keycodes = false
-})
-vim.g.copilot_no_tab_map = true
 
