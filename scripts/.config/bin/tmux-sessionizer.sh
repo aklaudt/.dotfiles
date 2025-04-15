@@ -18,7 +18,7 @@ if [[ -z $selected ]]; then
 fi
 
 # Prepend the base path to the selected directory
-selected_path=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | grep "$selected")
+selected_path=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | grep "/$selected\$" | head -n 1)
 
 selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
