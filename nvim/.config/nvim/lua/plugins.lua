@@ -1,6 +1,6 @@
 return {
     -- Git related plugins
-    { 'dense-analysis/ale' },
+    -- { 'dense-analysis/ale' },
     {
         -- LSP Configuration & Plugins
         'neovim/nvim-lspconfig',

@@ -1,6 +1,6 @@
 require("aklaudt.core.options")
 require("aklaudt.core.keymaps")
-
+vim.loader.enable()
 -- Function to open the corresponding header/source file with support for .c and .hpp files
 function open_corresponding_file()
     local current_file = vim.api.nvim_buf_get_name(0)
@@ -92,6 +92,46 @@ vim.g.ale_enabled = 1
 --   javascript = { 'eslint' },
 --  typescript = { 'eslint' },
 -- }
+--
+-- vim.g.ale_fixers = {
+--    cpp = {'clang-format'},
+-- }
+
+vim.api.nvim_create_user_command("FormatCurrentBufferWithClang", function()
+  local filepath = vim.fn.expand("%:p")
+  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+
+  if vim.v.shell_error ~= 0 or git_root == nil or git_root == "" then
+    print("Not inside a Git repo.")
+    return
+  end
+
+  local config_file = git_root .. "/EmbeddedTeam.clang-format"
+  local format_options = ""
+
+  if vim.fn.filereadable(config_file) == 0 then
+    config_file = vim.fn.systemlist("find " .. git_root .. " -name EmbeddedTeam.clang-format")[1] or ""
+    if config_file == nil or config_file == "" then
+      config_file = git_root .. "/.clang-format"
+      format_options = "-style=file"
+    else
+      format_options = "-style=file:" .. config_file
+    end
+  else
+    format_options = "-style=file:" .. config_file
+  end
+
+  local cmd = "clang-format -i " .. format_options .. " " .. filepath
+  print("Running: " .. cmd)
+  os.execute(cmd)
+
+  -- Reload buffer
+  vim.cmd("edit!")
+end, {
+  desc = "Format current buffer using EmbeddedTeam.clang-format logic",
+})
+
+vim.keymap.set("n", "<leader>cf", ":FormatCurrentBufferWithClang<CR>", { desc = "Clang Format Current File" })
 
 -- Automatically fix linting issues on save
 vim.g.ale_fix_on_save = 1
@@ -143,96 +183,44 @@ end
 
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
-require('mason').setup()
-require('mason-lspconfig').setup()
+require("mason").setup()
+require("neodev").setup()
+
+local capabilities = capabilities
+local on_attach = on_attach
 
 local servers = {
   clangd = {},
-  ts_ls= {
+  ts_ls = {
     filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
     settings = {
-      javascript = {
-        format = { enable = false },
-      },
-      typescript = {
-        format = { enable = false },
-      },
+      javascript = { format = { enable = false } },
+      typescript = { format = { enable = false } },
     },
   },
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
+    -- wrap Lua settings under `settings`
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+      },
     },
   },
 }
 
-require('neodev').setup()
+local mason_lspconfig = require("mason-lspconfig")
+local lspconfig = require("lspconfig")
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-local mason_lspconfig = require 'mason-lspconfig'
-
-mason_lspconfig.setup {
+mason_lspconfig.setup({
   ensure_installed = vim.tbl_keys(servers),
-}
-
-local lspconfig = require('lspconfig')
-
-for server, config in pairs(servers) do
-  config.capabilities = capabilities
-  lspconfig[server].setup(config)
-end
-
--- [[ Configure nvim-cmp ]]
--- See `:help cmp`
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
-require('luasnip.loaders.from_vscode').lazy_load()
-luasnip.config.setup {}
-
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
+  automatic_enable = false,  -- <- avoid `vim.lsp.enable()` for now
+  handlers = {
+    function(server_name)
+      local cfg = vim.deepcopy(servers[server_name] or {})
+      cfg.capabilities = vim.tbl_deep_extend("force", {}, capabilities, cfg.capabilities or {})
+      cfg.on_attach = cfg.on_attach or on_attach
+      lspconfig[server_name].setup(cfg)
     end,
   },
-  mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
-    --   if cmp.visible() then
-    --     cmp.select_prev_item()
-    --   elseif luasnip.locally_jumpable(-1) then
-    --     luasnip.jump(-1)
-    --   else
-    --     fallback()
-    --   end
-    -- end, { 'i', 's' }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-  },
-}
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
-
+})

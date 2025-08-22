@@ -15,6 +15,12 @@
   -- }
 
  -- lua/plugins/rose-pine.lua
+-- return {
+--   "folke/tokyonight.nvim",
+--   lazy = false,
+--   priority = 1000,
+--   opts = {},
+-- }
 return { 
 	"rose-pine/neovim", 
 	name = "rose-pine",
