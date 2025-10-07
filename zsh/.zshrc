@@ -12,8 +12,8 @@ fi
 export PYTHONPATH="{PYTHONPATH}:/home/andrewklaudt/.local/bin"
 export PATH="/home/andrewklaudt/.local/bin:$PATH"
 
-# Map to Docker Daemon running in windows
-export DOCKER_HOST=tcp://localhost:2375
+# # Map to Docker Daemon running in windows
+# export DOCKER_HOST=tcp://localhost:2375
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -105,6 +105,7 @@ alias ls='exa --icons'
 alias cat='batcat'
 alias tree="exa --icons --tree"
 alias nv="nvim ."
+alias lg="lazygit"
 eval $(thefuck --alias shit)
 eval $(thefuck -y --alias shitty)
 
@@ -150,6 +151,19 @@ open_with() {
 
 ow() {
   open_with "$@"
+}
+
+cf() {
+  local file
+  file=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) | fzf)
+
+  if [[ -n "$file" ]]; then
+    echo "Formatting $file..."
+    clang-format -i "$file"
+    echo "Done."
+  else
+    echo "No file selected."
+  fi
 }
 
 alias sm="git submodule update --init --recursive"
