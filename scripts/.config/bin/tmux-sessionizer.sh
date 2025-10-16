@@ -9,7 +9,7 @@ directories=(
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | fzf --height 50% --tmux 50%)
+    selected=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | fzf-tmux -p)
 fi
 
 if [[ -z $selected ]]; then
