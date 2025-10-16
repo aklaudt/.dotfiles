@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# DEV_ENV=$(pwd) ./setup_env.sh "filter"
+
 # Stops immediately on any error or undefined variable
 set -euo pipefail
 
