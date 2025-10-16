@@ -170,7 +170,7 @@ alias sm="git submodule update --init --recursive"
 alias smf="git submodule update --init --recursive --force"
 
 # Alias for initializing SSH Agent
-alias ssh-init='eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && ssh-add ~/.ssh/github && ssh-add ~/.ssh/gitlab'
+alias ssh-init='eval "$(ssh-agent -s)" && for key in ~/.ssh/*; do [[ -f "$key" && "$(head -c 5 "$key")" == "-----" ]] && ssh-add "$key"; done'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
