@@ -1,0 +1,26 @@
+[core]
+    editor = nvim
+    autocrlf = input
+[push]
+    default = current
+[pull]
+    rebase = false
+
+# Personal stuff 
+[includeIf "gitdir:~/src/personal/"]
+    path = ~/.config/git/personal.gitconfig
+
+# Work stuff 
+[includeIf "gitdir:~/work/"]
+    path = ~/.config/git/work.gitconfig
+
+# Fallback machine-local overrides 
+[include]
+    path = ~/.gitconfig.local
+
+[user]
+    useConfigOnly = true
+
+[alias]
+    sm = submodule update --init --recursive --force
+
