@@ -6,15 +6,6 @@ set -euo pipefail
 # Resolve the directory this script lives in
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
-# Ensure DEV_ENV is set
-if [[ -z "${DEV_ENV:-}" ]]; then
-    echo "Error: environment variable DEV_ENV must be set."
-    exit 1
-fi
-
-# Re-export so child scripts can use it
-export DEV_ENV="$DEV_ENV"
-
 # Defaults
 filter=""
 dry_run=false
@@ -41,7 +32,7 @@ log() {
     fi
 }
 
-log "RUN: DEV_ENV=$DEV_ENV | filter='$filter'"
+log "RUN: filter='$filter'"
 
 # Find executable files in jobs/
 mapfile -t run_scripts < <(find "$script_dir/jobs" -mindepth 1 -maxdepth 1 -type f -perm -111 | sort)

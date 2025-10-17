@@ -13,10 +13,13 @@ ensure_repo() { [ -d "$2/.git" ] && git -C "$2" pull --ff-only || git clone --de
 
 ensure_repo https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 ensure_repo https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+ensure_repo https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
 ensure_repo https://github.com/romkatv/powerlevel10k "$ZSH_CUSTOM/themes/powerlevel10k"
 
-# Make zsh the default shell if it isn't already (don't fail the job if chsh needs a tty)
-if [ "$(basename "${SHELL:-}")" != "zsh" ]; then chsh -s "$(command -v zsh)" || true; fi
+if [ "$(basename "${SHELL:-}")" != "zsh" ]; then
+  chsh -s "$(command -v zsh)" || true
+fi
 
-echo 'Set in ~/.zshrc if not already: ZSH_THEME="powerlevel10k/powerlevel10k" and plugins=(git zsh-autosuggestions zsh-syntax-highlighting)'
-
+echo '✅ Zsh + Oh My Zsh installed.'
+echo '✅ Plugins cloned: autosuggestions, syntax-highlighting, fast-syntax-highlighting.'
+echo '✅ Theme cloned: powerlevel10k.'
