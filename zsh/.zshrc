@@ -82,7 +82,7 @@ plugins=(
     git
     zsh-autosuggestions
     zsh-syntax-highlighting
-    fast-syntax-highlighting
+    copypath
     )
 
 source $ZSH/oh-my-zsh.sh
@@ -166,6 +166,7 @@ alias smf="git submodule update --init --recursive --force"
 
 # Alias for initializing SSH Agent
 alias ssh-init='eval "$(ssh-agent -s)" && for key in ~/.ssh/*; do [[ -f "$key" && "$(head -c 5 "$key")" == "-----" ]] && ssh-add "$key"; done'
+alias copypath="wslpath -w $(pwd) | clip.exe"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
