@@ -13,7 +13,6 @@ ensure_repo() { [ -d "$2/.git" ] && git -C "$2" pull --ff-only || git clone --de
 
 ensure_repo https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 ensure_repo https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-ensure_repo https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
 ensure_repo https://github.com/romkatv/powerlevel10k "$ZSH_CUSTOM/themes/powerlevel10k"
 
 if [ "$(basename "${SHELL:-}")" != "zsh" ]; then

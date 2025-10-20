@@ -11,7 +11,7 @@
     path = ~/.config/git/personal.gitconfig
 
 # Work stuff 
-[includeIf "gitdir:~/work/"]
+[includeIf "gitdir:~/repos/"]
     path = ~/.config/git/work.gitconfig
 
 # Fallback machine-local overrides 
