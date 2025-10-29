@@ -23,17 +23,21 @@ tmux_running=$(pgrep tmux)
 # Start a new tmux session if tmux is not running
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
     tmux new-session -s "$selected_name" -c "$selected" -d
-    tmux send-keys -t "$selected_name" "nvim" C-m
-    tmux new-window -t "$selected_name" -c "$selected"
+    tmux send-keys -t "$selected_name" "nvim ." C-m                      # window 1: nvim
+    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
+    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
+    tmux send-keys -t "$selected_name" "lazygit" C-m                      # window 1: nvim
     tmux attach-session -t "$selected_name"
     exit 0
 fi
 
 # Create a new tmux session if it doesn't exist
-if ! tmux has-session -t="$selected_name" 2> /dev/null; then
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
     tmux new-session -s "$selected_name" -c "$selected" -d
-    tmux send-keys -t "$selected_name" "nvim" C-m
-    tmux new-window -t "$selected_name" -c "$selected"
+    tmux send-keys -t "$selected_name" "nvim ." C-m                      # window 1: nvim
+    tmux new-window  -t "$selected_name" -c "$selected"                 # window 2: shell
+    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
+    tmux send-keys -t "$selected_name" "lazygit" C-m                      # window 1: nvim
     tmux select-window -t "$selected_name":1
 fi
 
