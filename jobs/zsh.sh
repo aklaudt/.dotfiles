@@ -8,7 +8,8 @@ if [ ! -d "$ZSH" ]; then
   RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
-ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH}"
+echo $ZSH_CUSTOM
 ensure_repo() { [ -d "$2/.git" ] && git -C "$2" pull --ff-only || git clone --depth=1 "$1" "$2"; }
 
 ensure_repo https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"

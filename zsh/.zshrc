@@ -81,9 +81,12 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(
     git
     zsh-autosuggestions
-    zsh-syntax-highlighting
-    copypath
+    fast-syntax-highlighting
     )
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_USE_ASYNC=1
 
 source $ZSH/oh-my-zsh.sh
 

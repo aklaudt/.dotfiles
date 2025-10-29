@@ -11,6 +11,7 @@ PACKAGES=(
   eza
   cmake
   clang
+  bat
   clang-tidy
 )
 
