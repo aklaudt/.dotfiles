@@ -22,5 +22,6 @@
     useConfigOnly = true
 
 [alias]
-    sm = submodule update --init --recursive --force
+    sm = submodule update --init --recursive
+    smf = submodule update --init --recursive --force
 
