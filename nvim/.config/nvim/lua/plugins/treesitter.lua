@@ -5,7 +5,7 @@ return {
   event = 'VeryLazy',
   config = function()
     vim.defer_fn(function()
-      require('nvim-treesitter.configs').setup {
+      require('nvim-treesitter').setup {
         ensure_installed = {
           'c', 'cpp', 'cmake', 'json', -- <- added cmake + json
           'go', 'lua', 'python', 'rust',
