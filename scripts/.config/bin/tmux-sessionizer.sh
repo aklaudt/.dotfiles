@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 
 directories=(
-    # "$HOME/../../mnt/c/repos/"
-    "$HOME/../../mnt/c/personal/"
-    "$HOME/repos/"
+  # "$HOME/../../mnt/c/repos/"
+  "$HOME/../../mnt/c/personal/"
+  "$HOME/repos/"
 )
 
 if [[ $# -eq 1 ]]; then
-    selected=$1
+  selected=$1
 else
-    selected=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | fzf-tmux -p)
+  selected=$(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d | fzf-tmux -p)
 fi
 
 if [[ -z $selected ]]; then
-    echo "No selection made. Exiting."
-    exit 0
+  echo "No selection made. Exiting."
+  exit 0
 fi
 
 selected_name=$(basename "$selected" | tr . _)
@@ -22,28 +22,32 @@ tmux_running=$(pgrep tmux)
 
 # Start a new tmux session if tmux is not running
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s "$selected_name" -c "$selected" -d
-    tmux send-keys -t "$selected_name" "nvim ." C-m                      # window 1: nvim
-    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
-    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
-    tmux send-keys -t "$selected_name" "lazygit" C-m                      # window 1: nvim
-    tmux attach-session -t "$selected_name"
-    exit 0
+  tmux new-session -s "$selected_name" -c "$selected" -d
+  tmux send-keys -t "$selected_name" "lvim ." C-m    # window 1: lvim
+  tmux new-window -t "$selected_name" -c "$selected" # window 2: shell
+  tmux new-window -t "$selected_name" -c "$selected" # window 3: lazygit
+  tmux send-keys -t "$selected_name" "lazygit" C-m
+  tmux new-window -t "$selected_name" -c "$selected" -n "Copilot" # window 4: copilot
+  tmux send-keys -t "$selected_name" "copilot" C-m
+  tmux attach-session -t "$selected_name"
+  exit 0
 fi
 
 # Create a new tmux session if it doesn't exist
 if ! tmux has-session -t="$selected_name" 2>/dev/null; then
-    tmux new-session -s "$selected_name" -c "$selected" -d
-    tmux send-keys -t "$selected_name" "nvim ." C-m                      # window 1: nvim
-    tmux new-window  -t "$selected_name" -c "$selected"                 # window 2: shell
-    tmux new-window -t "$selected_name" -c "$selected"                 # window 2: shell
-    tmux send-keys -t "$selected_name" "lazygit" C-m                      # window 1: nvim
-    tmux select-window -t "$selected_name":1
+  tmux new-session -s "$selected_name" -c "$selected" -d
+  tmux send-keys -t "$selected_name" "lvim ." C-m    # window 1: lvim
+  tmux new-window -t "$selected_name" -c "$selected" # window 2: shell
+  tmux new-window -t "$selected_name" -c "$selected" # window 3: lazygit
+  tmux send-keys -t "$selected_name" "lazygit" C-m
+  tmux new-window -t "$selected_name" -c "$selected" -n "Copilot" # window 4: copilot
+  tmux send-keys -t "$selected_name" "copilot" C-m
+  tmux select-window -t "$selected_name":1
 fi
 
 # Switch to the tmux session
 if [[ -n $TMUX ]]; then
-    tmux switch-client -t "$selected_name"
+  tmux switch-client -t "$selected_name"
 else
-    tmux attach-session -t "$selected_name"
+  tmux attach-session -t "$selected_name"
 fi
