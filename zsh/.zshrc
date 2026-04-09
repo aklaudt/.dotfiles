@@ -106,6 +106,7 @@ alias cat='batcat'
 alias tree="exa --icons --tree"
 alias nv="nvim ."
 alias lg="lazygit"
+alias lvim='NVIM_APPNAME=nvim-lazyvim nvim'
 
 typeset -A program_extensions
 program_extensions=(
