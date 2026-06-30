@@ -105,8 +105,10 @@ alias ls='exa --icons'
 alias cat='batcat'
 alias tree="exa --icons --tree"
 alias nv="nvim ."
+alias lv="lvim ."
 alias lg="lazygit"
 alias lvim='NVIM_APPNAME=nvim-lazyvim nvim'
+alias git-clean='git fetch --prune && git branch -vv | grep ": gone]" | awk "{print \$1}" | xargs git branch -d'
 
 typeset -A program_extensions
 program_extensions=(
