@@ -20,8 +20,14 @@
 
 [user]
     useConfigOnly = true
+	name = Andrew Klaudt
+	email = andrew.klaudt@external.cnhind.com
 
 [alias]
     sm = submodule update --init --recursive
     smf = submodule update --init --recursive --force
 
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[url "ssh://git@gitlab.cnh.com/"]
+	insteadOf = https://gitlab.cnh.com/
