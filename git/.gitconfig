@@ -26,6 +26,7 @@
 [alias]
     sm = submodule update --init --recursive
     smf = submodule update --init --recursive --force
+    prune-all = "!git pull --prune && git branch -vv | awk '/: gone]/{print $1}' | xargs -r git branch -D"
 
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
