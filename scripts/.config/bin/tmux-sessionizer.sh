@@ -5,6 +5,7 @@ directories=(
   "$HOME/../../mnt/c/personal/"
   "$HOME/repos/"
   "$HOME/omnitech/"
+  "$HOME/sandbox/"
 )
 
 history_file="$HOME/.tmux-sessionizer-history"
@@ -41,6 +42,7 @@ else
   while IFS= read -r d; do
     all_dirs+=("$d")
   done < <(find "${directories[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
+  all_dirs+=("$HOME/.dotfiles")
 
   # Build prioritized list
   declare -A seen
@@ -106,29 +108,28 @@ fi
 selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
+create_session() {
+  tmux new-session -s "$selected_name" -c "$selected" -d
+  tmux send-keys -t "$selected_name" "lvim ." C-m                # window 1, left: lvim
+  tmux split-window -h -t "$selected_name" -c "$selected"        # window 1, right: claude
+  tmux send-keys -t "$selected_name" "claude" C-m
+  tmux new-window -t "$selected_name" -c "$selected"             # window 2: shell
+  tmux new-window -t "$selected_name" -c "$selected"             # window 3: lazygit
+  tmux send-keys -t "$selected_name" "lazygit" C-m
+  tmux select-window -t "$selected_name":1
+  tmux select-pane -t "$selected_name":1 -L                      # focus lvim
+}
+
 # Start a new tmux session if tmux is not running
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-  tmux new-session -s "$selected_name" -c "$selected" -d
-  tmux send-keys -t "$selected_name" "lvim ." C-m    # window 1: lvim
-  tmux new-window -t "$selected_name" -c "$selected" # window 2: shell
-  tmux new-window -t "$selected_name" -c "$selected" # window 3: lazygit
-  tmux send-keys -t "$selected_name" "lazygit" C-m
-  tmux new-window -t "$selected_name" -c "$selected" -n "Claude" # window 4: claude
-  tmux send-keys -t "$selected_name" "claude" C-m
+  create_session
   tmux attach-session -t "$selected_name"
   exit 0
 fi
 
 # Create a new tmux session if it doesn't exist
 if ! tmux has-session -t="$selected_name" 2>/dev/null; then
-  tmux new-session -s "$selected_name" -c "$selected" -d
-  tmux send-keys -t "$selected_name" "lvim ." C-m    # window 1: lvim
-  tmux new-window -t "$selected_name" -c "$selected" # window 2: shell
-  tmux new-window -t "$selected_name" -c "$selected" # window 3: lazygit
-  tmux send-keys -t "$selected_name" "lazygit" C-m
-  tmux new-window -t "$selected_name" -c "$selected" -n "Claude" # window 4: claude
-  tmux send-keys -t "$selected_name" "claude" C-m
-  tmux select-window -t "$selected_name":1
+  create_session
 fi
 
 # Switch to the tmux session
