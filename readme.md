@@ -22,7 +22,7 @@ If you manage symlinks with GNU Stow:
 2. From the repo root, link the desired module(s):
 
    ```bash
-   stow -t $HOME zsh tmux nvim git
+   stow -t $HOME zsh tmux nvim git herdr
    ```
 
    - Omit modules you do not need; rerun with `stow -D <module>` to remove a set of links.

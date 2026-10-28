@@ -1,0 +1,152 @@
+# herdr configuration — mirrors ~/.tmux.conf as closely as herdr allows.
+# Stow module:  stow -t $HOME herdr
+# Reload after editing:  herdr server reload-config   (or prefix + shift + r)
+#
+# Vocabulary map:  tmux session -> herdr workspace
+#                  tmux window  -> herdr tab
+#                  tmux pane    -> herdr pane
+
+onboarding = false
+
+[terminal]
+# tmux: set-option -g default-shell /usr/bin/zsh
+default_shell = "/usr/bin/zsh"
+shell_mode = "auto"
+# New tabs/panes inherit the cwd of the pane they were opened from.
+new_cwd = "follow"
+
+[theme]
+# tmux: @plugin 'fabioluciano/tmux-tokyo-night' + @powerkit_theme_variant 'night'
+name = "tokyo-night"
+
+[keys]
+# tmux: set-option -g prefix C-b
+prefix = "ctrl+b"
+
+# --- pane navigation (tmux: bind -r h/j/k/l select-pane) ---
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# --- splits ---
+# tmux: bind -r v split-window -v  (stacked)      -> herdr "horizontal"
+# tmux: bind -r s split-window -h  (side by side) -> herdr "vertical"
+split_horizontal = "prefix+v"
+split_vertical = "prefix+s"
+
+# --- tabs (tmux windows) ---
+switch_tab = "prefix+1..9"
+new_tab = "prefix+c"
+next_tab = "prefix+n"
+# tmux rebound prefix+p to "select window 4", leaving no previous-window key.
+# The home-row binding below claims prefix+p, so previous_tab stays unset.
+previous_tab = ""
+rename_tab = "prefix+shift+t"
+close_tab = "prefix+shift+x"
+# tmux: bind-key C-l last-window. herdr has no "last tab", but last_pane is the
+# closest equivalent and works across tabs and workspaces.
+last_pane = "prefix+ctrl+l"
+
+# --- workspaces (tmux sessions) ---
+# tmux: bind-key w choose-tree -Z ... -> herdr's built-in workspace picker.
+workspace_picker = "prefix+w"
+new_workspace = "prefix+shift+n"
+rename_workspace = "prefix+shift+w"
+close_workspace = "prefix+shift+d"
+goto = "prefix+g"
+
+# --- misc ---
+detach = "prefix+q"
+zoom = "prefix+z"
+resize_mode = "prefix+r"
+# tmux used prefix+r for reload; prefix+r is resize mode here, so reload keeps
+# herdr's default chord.
+reload_config = "prefix+shift+r"
+# tmux: set-window-option -g mode-keys vi
+copy_mode = "prefix+["
+# Open the focused pane's scrollback in $EDITOR.
+edit_scrollback = "prefix+e"
+# The agent sidebar replaces the old tmux-agent-monitor.sh popup.
+toggle_sidebar = "prefix+b"
+
+# --- home-row tab jumps (tmux: bind -r u/i/o/p select-window -t 1..4) ---
+# herdr only exposes indexed tab switching as a 1..9 block, so these go through
+# the socket API instead.
+[[keys.command]]
+key = "prefix+u"
+type = "shell"
+command = "~/.config/bin/herdr-goto-tab.sh 1"
+description = "focus tab 1"
+
+[[keys.command]]
+key = "prefix+i"
+type = "shell"
+command = "~/.config/bin/herdr-goto-tab.sh 2"
+description = "focus tab 2"
+
+[[keys.command]]
+key = "prefix+o"
+type = "shell"
+command = "~/.config/bin/herdr-goto-tab.sh 3"
+description = "focus tab 3"
+
+[[keys.command]]
+key = "prefix+p"
+type = "shell"
+command = "~/.config/bin/herdr-goto-tab.sh 4"
+description = "focus tab 4"
+
+# --- project finder (tmux: bind-key f run-shell tmux-sessionizer.sh) ---
+[[keys.command]]
+key = "prefix+f"
+type = "popup"
+command = "~/.config/bin/herdr-sessionizer.sh"
+description = "project finder"
+width = "80%"
+height = "60%"
+
+# lazygit in a popup, matching the `lg` alias.
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+description = "run lazygit"
+width = "90%"
+height = "90%"
+
+[ui]
+# tmux: set -g status-position top
+tab_bar_position = "top"
+# tmux: set-option -g -q mouse on / set -g set-clipboard on
+mouse_capture = true
+copy_on_select = true
+pane_borders = true
+# tmux-style internal splitters without an outer frame.
+pane_outer_borders = false
+# tmux: bind-key w choose-tree showed pane commands; symbols make agent state
+# readable at a glance in the sidebar.
+status_indicators = "symbols"
+window_title = "{hostname}: {workspace}"
+accent = "magenta"
+# tmux: @powerkit_plugins 'cpu,memory,git'. Git branch/status already live in the
+# sidebar space rows, so only cpu/memory need a status command.
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "command", command = "~/.config/bin/herdr-status.sh", interval_seconds = 5, timeout_seconds = 2 },
+  { type = "datetime", format = "%H:%M" },
+]
+tab_bar_right_separator = " · "
+
+[ui.sidebar.spaces]
+rows = [["state_icon", "workspace"], ["branch", "git_status"]]
+
+[ui.sidebar.agents]
+rows = [["state_icon", "workspace", "tab"], ["agent"]]
+
+[session]
+resume_agents_on_restore = true
+
+[advanced]
+# tmux: set -g history-limit 10000 (herdr sizes scrollback in bytes)
+scrollback_limit_bytes = 10000000
