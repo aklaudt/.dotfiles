@@ -88,13 +88,19 @@ else
   # 5. Current session last — you're already there
   prioritized+=("${deferred_current[@]}")
 
-  selected=$(printf '%s\n' "${prioritized[@]}" | fzf-tmux -p)
+  # Line format: <path>\t<display>; fzf shows only the display, we keep the path
+  selected=$(
+    for d in "${prioritized[@]}"; do
+      if dir_has_session "$d"; then
+        printf '%s\t\e[32m● %s\e[0m\n' "$d" "$d"
+      else
+        printf '%s\t  %s\n' "$d" "$d"
+      fi
+    done | fzf-tmux -p -- --ansi --delimiter=$'\t' --with-nth=2 | cut -f1
+  )
 fi
 
-if [[ -z $selected ]]; then
-  echo "No selection made. Exiting."
-  exit 0
-fi
+[[ -z $selected ]] && exit 0
 
 # Update history file: prepend selected, deduplicate, keep last 100
 {
