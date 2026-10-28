@@ -91,14 +91,19 @@ ZSH_AUTOSUGGEST_USE_ASYNC=1
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-function tmux_sessionizer() {
-  ~/.config/bin/tmux-sessionizer.sh "$@"
+# Ctrl-P opens the project finder for whichever multiplexer is running.
+function sessionizer() {
+  if [[ -n $HERDR_ENV ]]; then
+    ~/.config/bin/herdr-sessionizer.sh "$@"
+  else
+    ~/.config/bin/tmux-sessionizer.sh "$@"
+  fi
 }
 
-zle -N tmux_sessionizer
+zle -N sessionizer
 
 bindkey '^[[Z' autosuggest-execute
-bindkey '^P' tmux_sessionizer 
+bindkey '^P' sessionizer
 
 #Aliases
 alias ls='exa --icons'
@@ -109,6 +114,7 @@ alias lv="lvim ."
 alias lg="lazygit"
 alias lvim='NVIM_APPNAME=nvim-lazyvim nvim'
 alias git-clean='git fetch --prune && git branch -vv | grep ": gone]" | awk "{print \$1}" | xargs git branch -d'
+alias kitty='kitty --directory=/home/andrewk/repos'
 
 typeset -A program_extensions
 program_extensions=(
@@ -167,12 +173,16 @@ cf() {
   fi
 }
 
+deploy-build() {
+  ./scripts/build-with-docker.sh && ./scripts/deploy.sh "$1"
+}
+
 alias sm="git submodule update --init --recursive"
 alias smf="git submodule update --init --recursive --force"
 
 # Alias for initializing SSH Agent
 alias ssh-init='eval "$(ssh-agent -s)" && for key in ~/.ssh/*; do [[ -f "$key" && "$(head -c 5 "$key")" == "-----" ]] && ssh-add "$key"; done'
-alias copypath="wslpath -w $(pwd) | clip.exe"
+# alias copypath="wslpath -w $(pwd) | clip.exe"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -182,3 +192,4 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+export PATH="$HOME/.local/bin:$PATH"
